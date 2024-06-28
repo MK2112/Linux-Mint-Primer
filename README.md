@@ -2,6 +2,8 @@
 Remove unwanted pre-installed programs from Linux Mint.<br>
 Optionally setup Mint to be more efficient for portable use.
 
+This project is a fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
+
 ## How to use
 ```txt
 git clone https://www.github.com/MK2112/Linux-Mint-Primer
