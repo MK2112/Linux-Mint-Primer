@@ -1,15 +1,11 @@
-# Linux-Mint-Debloater
-Script to debloat Linux Mint. It removes a lot of random junk in LM that many people don't use. It also updates the system for you. 
+# Linux-Mint-Primer
+Remove unwanted pre-installed programs from Linux Mint.<br>
+Optionally setup Mint to be more efficient for portable use.
 
-# Requirements:
-1. Linux Mint
-2. Git (install with `sudo apt install git`)
-
-# How to use
-`git clone https://www.github.com/aaron-dev-git/Linux-Mint-Debloater`
-
-`cd Linux-Mint-Debloater`
-
-`chmod +x debloat-mint.sh`
-
-`sudo bash debloat-mint.sh`
+## How to use
+```txt
+git clone https://www.github.com/MK2112/Linux-Mint-Primer
+cd Linux-Mint-Primer
+chmod +x mint-primer.sh
+sudo bash mint-primer.sh
+```
