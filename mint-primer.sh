@@ -40,7 +40,7 @@ fi
 
 zenity --question --text "[?] Do you want to configure your system for portable use?" --no-wrap
 if [ $? = 0 ]; then
-	# Get some optimization tools
+	# Install some optimization tools
  	sudo apt update && sudo apt upgrade -y
 	sudo apt install -y tlp powertop thermald laptop-mode-tools cpufrequtils
 	
@@ -48,7 +48,7 @@ if [ $? = 0 ]; then
 	sudo systemctl enable tlp
 	sudo systemctl start tlp
 	
-	# Install and configure powertop
+	# Configure powertop
 	sudo powertop --auto-tune
 	
 	# Enable thermald for temperature management
@@ -101,12 +101,12 @@ if [ $? = 0 ]; then
     	BT_CONF_FILE="/etc/bluetooth/main.conf"
     	if [ ! -f "$BT_CONF_FILE" ]; then
         	echo "[!] Bluetooth Config Error: $BT_CONF_FILE does not exist."
-        	exit 1
+        	return 1
     	fi
     
     	if [ ! -w "$BT_CONF_FILE" ]; then
         	echo "[!] No write permission for $BT_CONF_FILE. Please run this script with sudo."
-	        exit 1
+	        return 2
     	fi
     
     	sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
@@ -155,4 +155,4 @@ else
 fi
 
 echo "[+] Script finished."
-exit
+return 0
