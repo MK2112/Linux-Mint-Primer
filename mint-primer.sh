@@ -101,12 +101,14 @@ if [ $? = 0 ]; then
     	BT_CONF_FILE="/etc/bluetooth/main.conf"
     	if [ ! -f "$BT_CONF_FILE" ]; then
         	echo "[!] Bluetooth Config Error: $BT_CONF_FILE does not exist."
-        	return 1
+        	return 1 2>/dev/null
+                exit 1
     	fi
     
     	if [ ! -w "$BT_CONF_FILE" ]; then
         	echo "[!] No write permission for $BT_CONF_FILE. Please run this script with sudo."
-	        return 2
+	        return 1 2>/dev/null
+                exit 1
     	fi
     
     	sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
@@ -155,4 +157,3 @@ else
 fi
 
 echo "[+] Script finished."
-return 0
