@@ -86,9 +86,6 @@ if [ $? = 0 ]; then
 		echo "powersave" | sudo tee $cpu/cpufreq/scaling_governor
 	done
 	
-	# Reduce 'swap temperature'
-	echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
-	
 	# Improve memory management
 	sudo apt install -y zram-config
 	
@@ -107,9 +104,6 @@ if [ $? = 0 ]; then
 	for i in /sys/class/scsi_host/host*/link_power_management_policy; do
         echo "min_power" | sudo tee $i
 	done
-
-	# Disable NMI watchdog
-	echo "kernel.nmi_watchdog = 0" | sudo tee -a /etc/sysctl.conf
 
 	# Power Saving for USB devices
 	for i in /sys/bus/usb/devices/*/power/control; do
@@ -132,8 +126,6 @@ if [ $? = 0 ]; then
     	echo "[!] Failed To Update $BT_CONF_FILE Or Setting 'AutoEnable=true' Was Not Found. Check Manually. Skipped."
 	fi
 
-	sudo sysctl -p
-
 	# Install and configure preload for faster application launch
 	sudo apt install -y preload
 	sudo systemctl enable preload
@@ -147,7 +139,7 @@ else
 	echo "[>] Skipped Optimization For Portability."
 fi
 
-zenity --question --text "[?] Halt And Remove Flatpak?" --no-wrap
+zenity --question --text "Halt And Remove Flatpak?" --no-wrap
 if [ $? = 0 ]; then
 	sudo apt purge flatpak
 	sudo apt-mark hold flatpak
@@ -156,55 +148,75 @@ else
 	echo "[>] Skipped Flatpak Removal."
 fi
 
-zenity --question --text "[?] Optimize Boot Time?" --no-wrap
+zenity --question --text "Optimize Boot Time?" --no-wrap
 if [ $? = 0 ]; then
-	# Decrease GRUB timeout
-	sed -i 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/' /etc/default/grub
-	# Disable GRUB submenu
-	sed -i 's/#GRUB_DISABLE_SUBMENU=y/GRUB_DISABLE_SUBMENU=y/' /etc/default/grub
-	update-grub
+    # Decrease GRUB timeout
+    sudo sed -i 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/' /etc/default/grub
+    # Disable GRUB submenu
+    sudo sed -i 's/#GRUB_DISABLE_SUBMENU=y/GRUB_DISABLE_SUBMENU=y/' /etc/default/grub
+    # Disable GRUB Boot Animations
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/GRUB_CMDLINE_LINUX_DEFAULT="quiet nosplash"/' /etc/default/grub
+    sudo update-grub
 
-	# Services start 'more concurrently'
-	sed -i 's/#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=40s/' /etc/systemd/system.conf
-	sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=40s/' /etc/systemd/system.conf
+    # Reduce tty count used during boot
+    sudo sed -i 's/^#NAutoVTs=6/NAutoVTs=2/' /etc/systemd/logind.conf
 
-	# Prefetching Boot-relevant files
-	apt install -y systemd-readahead
-	systemctl enable systemd-readahead-collect.service
-	systemctl enable systemd-readahead-replay.service
+    # Services start 'more concurrently'
+    sudo sed -i 's/#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=40s/' /etc/systemd/system.conf
+    sudo sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=40s/' /etc/systemd/system.conf
+    sudo systemctl daemon-reload
 
- 	echo "[+] Boot Optimization Successful."
+    echo "[+] Boot Optimization Successful."
 else
-	echo "[>] Skipped Boot Optimization."
+    echo "[>] Skipped Boot Optimization."
 fi
 
-zenity --question --text "[?] Update The System?" --no-wrap
+zenity --question --text "Update The System?" --no-wrap
 if [ $? = 0 ]; then
 	sudo apt update && sudo apt upgrade -y
 else
-	echo "[>] Update Skipped."
+	echo "[>] Skipped Update."
 fi
 
-zenity --question --text "[?] Install Programs From List?" --no-wrap
+zenity --question --text "Install Programs From List?" --no-wrap
 if [ $? = 0 ]; then
-	declare -A programs=(
-		# Just some examples here really, modify this to your needs
-	    ["Git"]="apt install -y git"
-	    ["VLC"]="apt install -y vlc"
-	    # ...
-	)
+    declare -A programs
+    # Just some examples here really, modify this to your needs
+    programs["Git"]="apt install -y git"
+    programs["Git-LFS"]="apt install -y git-lfs"
+    programs["VLC"]="apt install -y vlc"
+    programs["Flameshot"]="apt install -y flameshot"
+    programs["PDFArranger"]="apt install -y pdfarranger"
+    programs["OneDrive"]="apt install -y onedrive"
+    programs["OBS"]="apt install -y obs-studio"
+    programs["Audacity"]="apt install -y audacity"
+    programs["Brasero"]="apt install -y brasero"
+    programs["Kid3"]="apt install -y kid3"
+    programs["Pinta"]="apt install -y pinta"
+    programs["Remmina"]="apt install -y remmina"
+    programs["NumLockX"]="apt install -y numlockx"
+    # ...
 
-	for program in "${!programs[@]}"; do
-	    echo "Installing $program..."
-	    if eval ${programs[$program]}; then
-	        echo "[+] Installed $program."
-	    else
-	        echo "[-] Failed Installing $program."
-	    fi
-	done
+    for program in "${!programs[@]}"; do
+        echo "Installing $program..."
+        if eval ${programs[$program]}; then
+            echo "[+] Installed $program."
+            echo
+        else
+            echo "[-] Failed Installing $program."
+            echo
+        fi
+    done
 else
-	echo "[>] Skipped Program Installations."
+    echo "[>] Skipped Program Installations."
 fi
 
+echo
 echo "[+] Script Finished."
-echo "[>] Restart For Changes To Take Effect."
+echo "[>] Reboot For Changes To Take Effect."
+echo
+
+zenity --question --text "Reboot Now?" --no-wrap
+if [ $? = 0 ]; then
+	reboot
+fi
