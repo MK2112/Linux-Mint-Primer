@@ -1,13 +1,26 @@
-# Linux-Mint-Primer
-Remove unwanted pre-installed programs from Linux Mint.<br>
-Optionally setup Mint to be more efficient in different scenarios.
+# Linux Mint Primer
 
-This project is a fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
+Streamline and optimize your Linux Mint.
 
-## How to use
-```txt
-git clone https://www.github.com/MK2112/Linux-Mint-Primer
+## Features
+
+- Backup: Create a system snapshot before making changes
+- Debloat: Remove pre-installed, unnecessary programs
+- Optimize: Enhance system performance for portable use, decrease boot time, turn off Flatpak
+- Customize: Install a list of programs
+
+## Quick Start
+
+```bash
+git clone https://github.com/MK2112/Linux-Mint-Primer
 cd Linux-Mint-Primer
 chmod +x mint-primer.sh
-sudo bash mint-primer.sh
+sudo ./mint-primer.sh
 ```
+
+This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
+
+## Requirements
+
+- Linux Mint (tested on 21.3, 22 BETA)
+- Root privileges
