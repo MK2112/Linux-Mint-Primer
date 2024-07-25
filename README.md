@@ -22,5 +22,5 @@ This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https:/
 
 ## Requirements
 
-- Linux Mint (tested on 21.3, 22 BETA)
+- Linux Mint (tested on 21.3, 22 Stable)
 - Root privileges
