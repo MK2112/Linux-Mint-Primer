@@ -156,6 +156,40 @@ else
     echo "[>] Skipped Boot Optimization."
 fi
 
+zenity --question --text "Kill Telemetry In Firefox?" --no-wrap
+if [ $? = 0 ]; then
+    firefox_config=$(find "/home/${SUDO_USER:-$USER}/.mozilla/firefox/" -name "*.default-release" -exec echo {}/prefs.js \;)
+    if [ -f "$firefox_config" ]; then
+        echo 'user_pref("toolkit.telemetry.enabled", false);' >> "$firefox_config"
+        echo 'user_pref("toolkit.telemetry.unified", false);' >> "$firefox_config"
+		echo 'user_pref("browser.region.update.enabled", false);' >> "$firefox_config"
+		echo 'user_pref("extensions.getAddons.recommended.url", "");' >> "$firefox_config"
+        echo 'user_pref("extensions.getAddons.cache.enabled", false);' >> "$firefox_config"
+        echo 'user_pref("datareporting.healthreport.uploadEnabled", false);' >> "$firefox_config"
+        echo 'user_pref("datareporting.policy.dataSubmissionEnabled", false);' >> "$firefox_config"
+        echo 'user_pref("extensions.htmlaboutaddons.recommendations.enabled", false);' >> "$firefox_config"
+    else
+        echo "Firefox configuration file not found."
+    fi
+else
+	echo "[>] Skipped Firefox Telemetry Settings."
+fi
+
+zenity --question --text "Kill Telemetry In Thunderbird?" --no-wrap
+if [ $? = 0 ]; then
+    thunderbird_config=$(find "/home/${SUDO_USER:-$USER}/.thunderbird/" -name "*.default-esr" -exec echo {}/prefs.js \;)
+    if [ -f "$thunderbird_config" ]; then
+        echo 'user_pref("datareporting.healthreport.uploadEnabled", false);' >> "$thunderbird_config"
+        echo 'user_pref("datareporting.policy.dataSubmissionEnabled", false);' >> "$thunderbird_config"
+        echo 'user_pref("mail.shell.checkDefaultClient", false);' >> "$thunderbird_config"
+        echo 'user_pref("mailnews.start_page.enabled", false);' >> "$thunderbird_config"
+    else
+        echo "Thunderbird configuration file not found."
+    fi
+else
+	echo "[>] Skipped Thunderbird Telemetry Settings."
+fi
+
 zenity --question --text "Update The System?" --no-wrap
 if [ $? = 0 ]; then
 	sudo apt update && sudo apt upgrade -y
