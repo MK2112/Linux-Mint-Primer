@@ -1,6 +1,6 @@
 # Linux Mint Primer
 
-Streamline and optimize your Linux Mint.
+Streamline and optimize your Linux Mint 21.3 or 22.
 
 ## Features
 
