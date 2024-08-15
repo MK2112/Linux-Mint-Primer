@@ -6,7 +6,7 @@ if [ "$EUID" -ne 0 ]; then
 	exit 1
 fi
 
-zenity --question --text="Create Snapshot Before Doing Anything?" --no-wrap
+zenity --question --text="Create Snapshot?" --no-wrap
 if [ $? = 0 ]; then
 	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 	timeshift --create --comments "LM Primer - Automated Backup - $timestamp" --tags D
@@ -26,10 +26,10 @@ zenity --question --text="Debloat?" --no-wrap
 if [ $? = 0 ]; then
  	# These programs will be purged (delete from here if a program should stay)
 	programs=(
-	    redshift				# Screen Color adjustment tool for eye strain reduction
-	    libreoffice-core		# Core components of LibreOffice
-	    libreoffice-common		# Common files for LibreOffice
-	    transmission-gtk		# BitTorrent client
+	    redshift			# Screen Color adjustment tool for eye strain reduction
+	    libreoffice-core	# Core components of LibreOffice
+	    libreoffice-common	# Common files for LibreOffice
+	    transmission-gtk	# BitTorrent client
 	    hexchat			# Internet Relay Chat client
 	    baobab			# Disk usage analyzer
 	    seahorse		# GNOME frontend for GnuPG
@@ -52,9 +52,7 @@ if [ $? = 0 ]; then
 	    sudo apt purge "$program" -y
 	done
 
- 	# Remove residuals
 	sudo apt autoremove -y && sudo apt clean
-
  	echo "[+] System Debloated."
 else
 	echo "[>] Skipped System Debloat."
@@ -62,53 +60,42 @@ fi
 
 zenity --question --text "Prime For Portable Use?" --no-wrap
 if [ $? = 0 ]; then
-	# Install some optimization tools
+	# TLP, Powertop, ThermalD - Install
  	sudo apt update && sudo apt upgrade -y
-	sudo apt install -y tlp powertop thermald laptop-mode-tools cpufrequtils
+	sudo apt install -y tlp powertop thermald
 	
-	# Enable and start TLP for power management
+	# Thermald - Enable and Start
+	sudo systemctl enable thermald
+	sudo systemctl start thermald
+
+	# TLP - Enable and Start
 	sudo systemctl enable tlp
 	sudo systemctl start tlp
 	
-	# Configure powertop
-	sudo powertop --auto-tune
-	
-	# Enable thermald for temperature management
-	sudo systemctl enable thermald
-	sudo systemctl start thermald
-	
-	# Enable laptop-mode-tools
-	sudo systemctl enable laptop-mode
-	sudo systemctl start laptop-mode
-	
-	# Set CPU governor to powersave
-	for cpu in /sys/devices/system/cpu/cpu[0-9]*; do
-		echo "powersave" | sudo tee $cpu/cpufreq/scaling_governor
-	done
-	
-	# Improve memory management
-	sudo apt install -y zram-config
-	
-	# Power saving for Intel GPU (if exists)
-	if lspci | grep -i "VGA.*Intel" > /dev/null; then
-		echo "options i915 enable_rc6=1 enable_fbc=1 semaphores=1" | sudo tee /etc/modprobe.d/i915.conf
-	fi
-	
-	# Power saving for audio
-	echo "options snd_hda_intel power_save=1" | sudo tee /etc/modprobe.d/audio_powersave.conf
-
-	# Turn off Wake-on-LAN
-	sudo ethtool -s eth0 wol d
-
-	# Enable SATA power management
-	for i in /sys/class/scsi_host/host*/link_power_management_policy; do
-        echo "min_power" | sudo tee $i
-	done
-
-	# Power Saving for USB devices
-	for i in /sys/bus/usb/devices/*/power/control; do
-    	echo "auto" | sudo tee $i
-	done
+	# TLP - Configuration
+	sudo sed -i \
+    -e 's/#TLP_ENABLE=0/TLP_ENABLE=1/' \
+    -e 's/#TLP_DEFAULT_MODE=AC/TLP_DEFAULT_MODE=AC/' \
+    -e 's/#TLP_PERSISTENT_DEFAULT=0/TLP_PERSISTENT_DEFAULT=0/' \
+    -e 's/#CPU_SCALING_GOVERNOR_ON_AC=performance/CPU_SCALING_GOVERNOR_ON_AC=performance/' \
+    -e 's/#CPU_SCALING_GOVERNOR_ON_BAT=powersave/CPU_SCALING_GOVERNOR_ON_BAT=powersave/' \
+    -e 's/#CPU_ENERGY_PERF_POLICY_ON_AC=performance/CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance/' \
+    -e 's/#CPU_ENERGY_PERF_POLICY_ON_BAT=powersave/CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power/' \
+    -e 's/#CPU_MIN_PERF_ON_AC=0/CPU_MIN_PERF_ON_AC=0/' \
+    -e 's/#CPU_MAX_PERF_ON_AC=100/CPU_MAX_PERF_ON_AC=100/' \
+    -e 's/#CPU_MIN_PERF_ON_BAT=0/CPU_MIN_PERF_ON_BAT=0/' \
+    -e 's/#CPU_MAX_PERF_ON_BAT=30/CPU_MAX_PERF_ON_BAT=60/' \
+    -e 's/#DISK_DEVICES="sda sdb"/DISK_DEVICES="sda"/' \
+    -e 's/#DISK_APM_LEVEL_ON_AC="254 254"/DISK_APM_LEVEL_ON_AC="254 254"/' \
+    -e 's/#DISK_APM_LEVEL_ON_BAT="128 128"/DISK_APM_LEVEL_ON_BAT="128 128"/' \
+    -e 's/#WIFI_PWR_ON_AC=off/WIFI_PWR_ON_AC=off/' \
+    -e 's/#WIFI_PWR_ON_BAT=on/WIFI_PWR_ON_BAT=on/' \
+    -e 's/#WOL_DISABLE=Y/WOL_DISABLE=Y/' \
+    -e 's/#SOUND_POWER_SAVE_ON_AC=0/SOUND_POWER_SAVE_ON_AC=0/' \
+    -e 's/#SOUND_POWER_SAVE_ON_BAT=1/SOUND_POWER_SAVE_ON_BAT=1/' \
+    -e 's/#RUNTIME_PM_ON_AC=on/RUNTIME_PM_ON_AC=on/' \
+    -e 's/#RUNTIME_PM_ON_BAT=auto/RUNTIME_PM_ON_BAT=auto/' \
+    /etc/tlp.conf
 
 	# Disable Bluetooth on startup
 	BT_CONF_FILE="/etc/bluetooth/main.conf"
@@ -116,14 +103,14 @@ if [ $? = 0 ]; then
     	echo "[!] Bluetooth Config Error: $BT_CONF_FILE Does Not Exist."
     	return 1 2>/dev/null
         exit 1
+	else
+		sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
 	fi
-
-	sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
 
 	if grep -q "^AutoEnable=false" "$BT_CONF_FILE"; then
     	echo "[+] Successfully Updated $BT_CONF_FILE. AutoEnable Is Now Set To <False>."
 	else
-    	echo "[!] Failed To Update $BT_CONF_FILE Or Setting 'AutoEnable=true' Was Not Found. Check Manually. Skipped."
+    	echo "[!] Updating $BT_CONF_FILE Failed. Check Manually."
 	fi
 
 	# Install and configure preload for faster application launch
@@ -131,9 +118,7 @@ if [ $? = 0 ]; then
 	sudo systemctl enable preload
 	sudo systemctl start preload
 
- 	# Remove residuals
 	sudo apt autoremove -y && sudo apt clean
-
 	echo "[+] Successfully Optimized For Portability."
 else
 	echo "[>] Skipped Optimization For Portability."
@@ -160,11 +145,11 @@ if [ $? = 0 ]; then
 
     # Reduce tty count used during boot
     sudo sed -i 's/^#NAutoVTs=6/NAutoVTs=2/' /etc/systemd/logind.conf
-
     # Services start 'more concurrently'
     sudo sed -i 's/#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=40s/' /etc/systemd/system.conf
     sudo sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=40s/' /etc/systemd/system.conf
-    sudo systemctl daemon-reload
+    # Systemd daemon-reload
+	sudo systemctl daemon-reload
 
     echo "[+] Boot Optimization Successful."
 else
@@ -180,30 +165,29 @@ fi
 
 zenity --question --text "Install Programs From List?" --no-wrap
 if [ $? = 0 ]; then
-    declare -A programs
-    # Just some examples here really, modify this to your needs
-    programs["Git"]="apt install -y git"
-    programs["Git-LFS"]="apt install -y git-lfs"
-    programs["VLC"]="apt install -y vlc"
-    programs["Flameshot"]="apt install -y flameshot"
-    programs["PDFArranger"]="apt install -y pdfarranger"
-    programs["OneDrive"]="apt install -y onedrive"
-    programs["OBS"]="apt install -y obs-studio"
-    programs["Audacity"]="apt install -y audacity"
-    programs["Brasero"]="apt install -y brasero"
-    programs["Kid3"]="apt install -y kid3"
-    programs["Pinta"]="apt install -y pinta"
-    programs["Remmina"]="apt install -y remmina"
-    programs["NumLockX"]="apt install -y numlockx"
-    # ...
+    declare -A tools
+    # Just some examples really, modify to your needs
+    tools["Git"]="apt install -y git"
+    tools["Git-LFS"]="apt install -y git-lfs"
+    tools["VLC"]="apt install -y vlc"
+    tools["Flameshot"]="apt install -y flameshot"
+    tools["PDFArranger"]="apt install -y pdfarranger"
+    tools["OneDrive"]="apt install -y onedrive"
+    tools["OBS"]="apt install -y obs-studio"
+    tools["Audacity"]="apt install -y audacity"
+    tools["Brasero"]="apt install -y brasero"
+    tools["Kid3"]="apt install -y kid3"
+    tools["Pinta"]="apt install -y pinta"
+    tools["Remmina"]="apt install -y remmina"
+    tools["NumLockX"]="apt install -y numlockx"
 
-    for program in "${!programs[@]}"; do
-        echo "Installing $program..."
-        if eval ${programs[$program]}; then
-            echo "[+] Installed $program."
+    for tool in "${!tools[@]}"; do
+        echo "Installing $tool..."
+        if eval ${tools[$tool]}; then
+            echo "[+] Installed $tool."
             echo
         else
-            echo "[-] Failed Installing $program."
+            echo "[-] Failed Installing $tool."
             echo
         fi
     done
@@ -211,12 +195,7 @@ else
     echo "[>] Skipped Program Installations."
 fi
 
-echo
-echo "[+] Script Finished."
-echo "[>] Reboot For Changes To Take Effect."
-echo
-
-zenity --question --text "Reboot Now?" --no-wrap
+zenity --question --text "Script Finished. Reboot Now?" --no-wrap
 if [ $? = 0 ]; then
 	reboot
 fi
