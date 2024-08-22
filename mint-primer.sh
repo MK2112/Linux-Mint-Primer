@@ -74,51 +74,50 @@ if [ $? = 0 ]; then
 	
 	# TLP - Configuration
 	sudo sed -i \
-    -e 's/#TLP_ENABLE=0/TLP_ENABLE=1/' \
-    -e 's/#TLP_DEFAULT_MODE=AC/TLP_DEFAULT_MODE=AC/' \
-    -e 's/#TLP_PERSISTENT_DEFAULT=0/TLP_PERSISTENT_DEFAULT=0/' \
-    -e 's/#CPU_SCALING_GOVERNOR_ON_AC=performance/CPU_SCALING_GOVERNOR_ON_AC=performance/' \
-    -e 's/#CPU_SCALING_GOVERNOR_ON_BAT=powersave/CPU_SCALING_GOVERNOR_ON_BAT=powersave/' \
-    -e 's/#CPU_ENERGY_PERF_POLICY_ON_AC=performance/CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance/' \
-    -e 's/#CPU_ENERGY_PERF_POLICY_ON_BAT=powersave/CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power/' \
-    -e 's/#CPU_MIN_PERF_ON_AC=0/CPU_MIN_PERF_ON_AC=0/' \
-    -e 's/#CPU_MAX_PERF_ON_AC=100/CPU_MAX_PERF_ON_AC=100/' \
-    -e 's/#CPU_MIN_PERF_ON_BAT=0/CPU_MIN_PERF_ON_BAT=0/' \
-    -e 's/#CPU_MAX_PERF_ON_BAT=30/CPU_MAX_PERF_ON_BAT=60/' \
-    -e 's/#DISK_DEVICES="sda sdb"/DISK_DEVICES="sda"/' \
-    -e 's/#DISK_APM_LEVEL_ON_AC="254 254"/DISK_APM_LEVEL_ON_AC="254 254"/' \
-    -e 's/#DISK_APM_LEVEL_ON_BAT="128 128"/DISK_APM_LEVEL_ON_BAT="128 128"/' \
-    -e 's/#WIFI_PWR_ON_AC=off/WIFI_PWR_ON_AC=off/' \
-    -e 's/#WIFI_PWR_ON_BAT=on/WIFI_PWR_ON_BAT=on/' \
-    -e 's/#WOL_DISABLE=Y/WOL_DISABLE=Y/' \
-    -e 's/#SOUND_POWER_SAVE_ON_AC=0/SOUND_POWER_SAVE_ON_AC=0/' \
-    -e 's/#SOUND_POWER_SAVE_ON_BAT=1/SOUND_POWER_SAVE_ON_BAT=1/' \
-    -e 's/#RUNTIME_PM_ON_AC=on/RUNTIME_PM_ON_AC=on/' \
-    -e 's/#RUNTIME_PM_ON_BAT=auto/RUNTIME_PM_ON_BAT=auto/' \
-    /etc/tlp.conf
+ 	-e 's/#TLP_ENABLE=0/TLP_ENABLE=1/' \
+    	-e 's/#TLP_DEFAULT_MODE=AC/TLP_DEFAULT_MODE=AC/' \
+    	-e 's/#TLP_PERSISTENT_DEFAULT=0/TLP_PERSISTENT_DEFAULT=0/' \
+    	-e 's/#CPU_SCALING_GOVERNOR_ON_AC=performance/CPU_SCALING_GOVERNOR_ON_AC=performance/' \
+    	-e 's/#CPU_SCALING_GOVERNOR_ON_BAT=powersave/CPU_SCALING_GOVERNOR_ON_BAT=powersave/' \
+    	-e 's/#CPU_ENERGY_PERF_POLICY_ON_AC=performance/CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance/' \
+    	-e 's/#CPU_ENERGY_PERF_POLICY_ON_BAT=powersave/CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power/' \
+    	-e 's/#CPU_MIN_PERF_ON_AC=0/CPU_MIN_PERF_ON_AC=0/' \
+    	-e 's/#CPU_MAX_PERF_ON_AC=100/CPU_MAX_PERF_ON_AC=100/' \
+    	-e 's/#CPU_MIN_PERF_ON_BAT=0/CPU_MIN_PERF_ON_BAT=0/' \
+    	-e 's/#CPU_MAX_PERF_ON_BAT=30/CPU_MAX_PERF_ON_BAT=60/' \
+    	-e 's/#DISK_DEVICES="sda sdb"/DISK_DEVICES="sda"/' \
+    	-e 's/#DISK_APM_LEVEL_ON_AC="254 254"/DISK_APM_LEVEL_ON_AC="254 254"/' \
+    	-e 's/#DISK_APM_LEVEL_ON_BAT="128 128"/DISK_APM_LEVEL_ON_BAT="128 128"/' \
+    	-e 's/#WIFI_PWR_ON_AC=off/WIFI_PWR_ON_AC=off/' \
+    	-e 's/#WIFI_PWR_ON_BAT=on/WIFI_PWR_ON_BAT=on/' \
+    	-e 's/#WOL_DISABLE=Y/WOL_DISABLE=Y/' \
+    	-e 's/#SOUND_POWER_SAVE_ON_AC=0/SOUND_POWER_SAVE_ON_AC=0/' \
+    	-e 's/#SOUND_POWER_SAVE_ON_BAT=1/SOUND_POWER_SAVE_ON_BAT=1/' \
+    	-e 's/#RUNTIME_PM_ON_AC=on/RUNTIME_PM_ON_AC=on/' \
+    	-e 's/#RUNTIME_PM_ON_BAT=auto/RUNTIME_PM_ON_BAT=auto/' \
+    	/etc/tlp.conf
 
 	# Disable Bluetooth on startup
 	BT_CONF_FILE="/etc/bluetooth/main.conf"
 	if [ ! -f "$BT_CONF_FILE" ]; then
-    	echo "[!] Bluetooth Config Error: $BT_CONF_FILE Does Not Exist."
-    	return 1 2>/dev/null
-        exit 1
+    		echo "[!] Bluetooth Config Error: $BT_CONF_FILE Does Not Exist."
+    		return 1 2>/dev/null
+        	exit 1
 	else
 		sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
 	fi
 
 	if grep -q "^AutoEnable=false" "$BT_CONF_FILE"; then
-    	echo "[+] Successfully Updated $BT_CONF_FILE. AutoEnable Is Now Set To <False>."
+    		echo "[+] Successfully Updated $BT_CONF_FILE. AutoEnable Is Now Set To <False>."
 	else
-    	echo "[!] Updating $BT_CONF_FILE Failed. Check Manually."
+    		echo "[!] Updating $BT_CONF_FILE Failed. Check Manually."
 	fi
 
 	# Install and configure preload for faster application launch
 	sudo apt install -y preload
-	sudo systemctl enable preload
-	sudo systemctl start preload
-
+	sudo systemctl enable preload && sudo systemctl start preload
 	sudo apt autoremove -y && sudo apt clean
+ 
 	echo "[+] Successfully Optimized For Portability."
 else
 	echo "[>] Skipped Optimization For Portability."
@@ -149,7 +148,7 @@ if [ $? = 0 ]; then
     sudo sed -i 's/#DefaultTimeoutStartSec=90s/DefaultTimeoutStartSec=40s/' /etc/systemd/system.conf
     sudo sed -i 's/#DefaultTimeoutStopSec=90s/DefaultTimeoutStopSec=40s/' /etc/systemd/system.conf
     # Systemd daemon-reload
-	sudo systemctl daemon-reload
+    sudo systemctl daemon-reload
 
     echo "[+] Boot Optimization Successful."
 else
@@ -162,8 +161,8 @@ if [ $? = 0 ]; then
     if [ -f "$firefox_config" ]; then
         echo 'user_pref("toolkit.telemetry.enabled", false);' >> "$firefox_config"
         echo 'user_pref("toolkit.telemetry.unified", false);' >> "$firefox_config"
-		echo 'user_pref("browser.region.update.enabled", false);' >> "$firefox_config"
-		echo 'user_pref("extensions.getAddons.recommended.url", "");' >> "$firefox_config"
+	echo 'user_pref("browser.region.update.enabled", false);' >> "$firefox_config"
+	echo 'user_pref("extensions.getAddons.recommended.url", "");' >> "$firefox_config"
         echo 'user_pref("extensions.getAddons.cache.enabled", false);' >> "$firefox_config"
         echo 'user_pref("datareporting.healthreport.uploadEnabled", false);' >> "$firefox_config"
         echo 'user_pref("datareporting.policy.dataSubmissionEnabled", false);' >> "$firefox_config"
@@ -190,7 +189,7 @@ else
 	echo "[>] Skipped Thunderbird Telemetry Settings."
 fi
 
-zenity --question --text "Update The System?" --no-wrap
+zenity --question --text "Update And Upgrade The System?" --no-wrap
 if [ $? = 0 ]; then
 	sudo apt update && sudo apt upgrade -y
 else
@@ -200,7 +199,7 @@ fi
 zenity --question --text "Install Programs From List?" --no-wrap
 if [ $? = 0 ]; then
     declare -A tools
-    # Just some examples really, modify to your needs
+    # Just some examples, modify to your needs
     tools["Git"]="apt install -y git"
     tools["Git-LFS"]="apt install -y git-lfs"
     tools["VLC"]="apt install -y vlc"
