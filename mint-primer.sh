@@ -155,7 +155,7 @@ else
     echo "[>] Skipped Boot Optimization."
 fi
 
-zenity --question --text "Kill Telemetry In Firefox?" --no-wrap
+zenity --question --text "Disable Reporting and Telemetry?" --no-wrap
 if [ $? = 0 ]; then
     firefox_config=$(find "/home/${SUDO_USER:-$USER}/.mozilla/firefox/" -name "*.default-release" -exec echo {}/prefs.js \;)
     if [ -f "$firefox_config" ]; then
@@ -168,14 +168,9 @@ if [ $? = 0 ]; then
         echo 'user_pref("datareporting.policy.dataSubmissionEnabled", false);' >> "$firefox_config"
         echo 'user_pref("extensions.htmlaboutaddons.recommendations.enabled", false);' >> "$firefox_config"
     else
-        echo "Firefox configuration file not found."
+        echo "Could not address Firefox. Configuration file not found."
     fi
-else
-	echo "[>] Skipped Firefox Telemetry Settings."
-fi
 
-zenity --question --text "Kill Telemetry In Thunderbird?" --no-wrap
-if [ $? = 0 ]; then
     thunderbird_config=$(find "/home/${SUDO_USER:-$USER}/.thunderbird/" -name "*.default-esr" -exec echo {}/prefs.js \;)
     if [ -f "$thunderbird_config" ]; then
         echo 'user_pref("datareporting.healthreport.uploadEnabled", false);' >> "$thunderbird_config"
@@ -183,10 +178,14 @@ if [ $? = 0 ]; then
         echo 'user_pref("mail.shell.checkDefaultClient", false);' >> "$thunderbird_config"
         echo 'user_pref("mailnews.start_page.enabled", false);' >> "$thunderbird_config"
     else
-        echo "Thunderbird configuration file not found."
+        echo "Could not address Thunderbird. Configuration file not found."
     fi
+
+    # Already false by default, just making sure
+    gsettings set org.gnome.desktop.privacy send-software-usage-stats false
+    gsettings set org.gnome.desktop.privacy report-technical-problems false
 else
-	echo "[>] Skipped Thunderbird Telemetry Settings."
+	echo "[>] Skipped Reporting and Telemetry."
 fi
 
 zenity --question --text "Update And Upgrade The System?" --no-wrap
