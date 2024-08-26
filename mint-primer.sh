@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ "$EUID" -ne 0 ]; then
-  	echo "Please Run As Root."
+	echo "Please Run As Root."
   	return 1 2>/dev/null
 	exit 1
 fi
@@ -26,7 +26,7 @@ zenity --question --text="Debloat?" --no-wrap
 if [ $? = 0 ]; then
  	# Purging these programs (delete from list if program should stay)
 	programs=(
-		mintwelcome			# Welcome screen
+	    mintwelcome			# Welcome screen
 	    redshift			# Screen Color adjustment tool for eye strain reduction
 	    libreoffice-core	# Core components of LibreOffice
 	    libreoffice-common	# Common files for LibreOffice
@@ -44,7 +44,7 @@ if [ $? = 0 ]; then
 	    onboard				# On-screen keyboard
 	    celluloid			# Video player
 	    gnome-calendar		# Calendar application
-		gnome-contacts		# Contacts manager
+        gnome-contacts		# Contacts manager
 	    gnome-logs			# Log viewer for the systemd 
 	    gnome-power-manager	# GNOME desktop Power management tool
 	    warpinator			# Tool for local network file sharing
