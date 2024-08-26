@@ -270,7 +270,7 @@ if [ $? = 0 ]; then
         	fi
     	done
 else
-    echo "[>] Skipped Program Installations."
+	echo "[>] Skipped Program Installations."
 fi
 
 zenity --question --text "Script Finished. Reboot Now?" --no-wrap
