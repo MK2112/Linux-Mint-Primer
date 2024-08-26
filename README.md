@@ -4,10 +4,11 @@ Streamline and optimize your Linux Mint 21.3 or 22.
 
 ## Features
 
-- Backup: Create a system snapshot before making changes
-- Debloat: Remove pre-installed, unnecessary programs
-- Optimize: Enhance system performance for portable use, decrease boot time, turn off Flatpak
-- Customize: Install a list of programs
+- **Backup:** Create a system snapshot before making changes
+- **Debloat:** Remove pre-installed, unnecessary programs
+- **Optimize:** Enhance system performance, configure specifically for portable use, decrease boot time, turn off Flatpak
+- **Secure:** Install security updates, setup and configure UFW firewall
+- **Customize:** Install a list of programs
 
 ## Quick Start
 
