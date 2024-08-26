@@ -9,7 +9,7 @@ fi
 zenity --question --text="Create Snapshot?" --no-wrap
 if [ $? = 0 ]; then
 	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-	timeshift --create --comments "LM Primer - Automated Backup - $timestamp" --tags D
+	timeshift --create --comments "LM Primer - System Snapshot - $timestamp" --tags D
 
 	if [ $? -eq 0 ]; then
 	  	echo "Timeshift Snapshot Created Successfully."
@@ -24,28 +24,30 @@ fi
 
 zenity --question --text="Debloat?" --no-wrap
 if [ $? = 0 ]; then
- 	# These programs will be purged (delete from here if a program should stay)
+ 	# Purging these programs (delete from list if program should stay)
 	programs=(
+		mintwelcome			# Welcome screen
 	    redshift			# Screen Color adjustment tool for eye strain reduction
 	    libreoffice-core	# Core components of LibreOffice
 	    libreoffice-common	# Common files for LibreOffice
 	    transmission-gtk	# BitTorrent client
-	    hexchat			# Internet Relay Chat client
-	    baobab			# Disk usage analyzer
-	    seahorse		# GNOME frontend for GnuPG
-	    thunderbird		# Email and news client
-	    rhythmbox		# Music player
-	    pix				# Image viewer and browser
-	    simple-scan		# Scanning utility
-	    drawing			# Drawing application
-	    gnote			# Note-taking application
-	    xreader			# Document viewer
-	    onboard			# On-screen keyboard
-	    celluloid			 # Video player
-	    gnome-calendar		 # Calendar application
-	    gnome-logs			 # Log viewer for the systemd 
-	    gnome-power-manager	 # GNOME desktop Power management tool
-	    warpinator			 # Tool for local network file sharing
+	    hexchat				# Internet Relay Chat client
+	    baobab				# Disk usage analyzer
+	    seahorse			# GNOME frontend for GnuPG
+	    thunderbird			# Email and news client
+	    rhythmbox			# Music player
+	    pix					# Image viewer and browser
+	    simple-scan			# Scanning utility
+	    drawing				# Drawing application
+	    gnote				# Note-taking application
+	    xreader				# Document viewer
+	    onboard				# On-screen keyboard
+	    celluloid			# Video player
+	    gnome-calendar		# Calendar application
+		gnome-contacts		# Contacts manager
+	    gnome-logs			# Log viewer for the systemd 
+	    gnome-power-manager	# GNOME desktop Power management tool
+	    warpinator			# Tool for local network file sharing
 	)
 
 	for program in "${programs[@]}"; do
@@ -64,14 +66,19 @@ if [ $? = 0 ]; then
  	sudo apt update && sudo apt upgrade -y
 	sudo apt install -y tlp powertop thermald
 	
-	# Thermald - Enable and Start
+	# Thermald - Start
 	sudo systemctl enable thermald
 	sudo systemctl start thermald
 
-	# TLP - Enable and Start
+	# TLP - Start
 	sudo systemctl enable tlp
 	sudo systemctl start tlp
 	
+	# Powertop - Auto Tune (if running on battery)
+	if $(cat /sys/class/power_supply/AC/online) = 0; then
+		sudo powertop --auto-tune
+	fi
+
 	# TLP - Configuration
 	sudo sed -i \
  	-e 's/#TLP_ENABLE=0/TLP_ENABLE=1/' \
@@ -100,17 +107,17 @@ if [ $? = 0 ]; then
 	# Disable Bluetooth on startup
 	BT_CONF_FILE="/etc/bluetooth/main.conf"
 	if [ ! -f "$BT_CONF_FILE" ]; then
-    		echo "[!] Bluetooth Config Error: $BT_CONF_FILE Does Not Exist."
-    		return 1 2>/dev/null
-        	exit 1
+		echo "[!] Bluetooth Config Error: $BT_CONF_FILE Does Not Exist."
+		return 1 2>/dev/null
+		exit 1
 	else
 		sed -i 's/^AutoEnable=true/AutoEnable=false/' "$BT_CONF_FILE"
 	fi
 
 	if grep -q "^AutoEnable=false" "$BT_CONF_FILE"; then
-    		echo "[+] Successfully Updated $BT_CONF_FILE. AutoEnable Is Now Set To <False>."
+    	echo "[+] Successfully Updated $BT_CONF_FILE. AutoEnable Is Now Set To <False>."
 	else
-    		echo "[!] Updating $BT_CONF_FILE Failed. Check Manually."
+    	echo "[!] Updating $BT_CONF_FILE Failed. Check Manually."
 	fi
 
 	# Install and configure preload for faster application launch
@@ -123,13 +130,13 @@ else
 	echo "[>] Skipped Optimization For Portability."
 fi
 
-zenity --question --text "Halt And Remove Flatpak?" --no-wrap
+zenity --question --text "Disable Flatpak?" --no-wrap
 if [ $? = 0 ]; then
 	sudo apt purge flatpak
 	sudo apt-mark hold flatpak
- 	echo "[+] Disabled And Removed Flatpak."
+ 	echo "[+] Disabled Flatpak."
 else
-	echo "[>] Skipped Flatpak Removal."
+	echo "[>] Skipped Disabling Flatpak."
 fi
 
 zenity --question --text "Optimize Boot Time?" --no-wrap
@@ -161,14 +168,16 @@ if [ $? = 0 ]; then
     if [ -f "$firefox_config" ]; then
         echo 'user_pref("toolkit.telemetry.enabled", false);' >> "$firefox_config"
         echo 'user_pref("toolkit.telemetry.unified", false);' >> "$firefox_config"
-	echo 'user_pref("browser.region.update.enabled", false);' >> "$firefox_config"
-	echo 'user_pref("extensions.getAddons.recommended.url", "");' >> "$firefox_config"
+		echo 'user_pref("browser.region.update.enabled", false);' >> "$firefox_config"
+		echo 'user_pref("extensions.getAddons.recommended.url", "");' >> "$firefox_config"
         echo 'user_pref("extensions.getAddons.cache.enabled", false);' >> "$firefox_config"
         echo 'user_pref("datareporting.healthreport.uploadEnabled", false);' >> "$firefox_config"
         echo 'user_pref("datareporting.policy.dataSubmissionEnabled", false);' >> "$firefox_config"
+		echo 'user_pref("browser.newtabpage.activity-stream.telemetry", false);' >> "$firefox_config"
+		echo 'user_pref("browser.newtabpage.activity-stream.feeds.telemetry", false);' >> "$firefox_config"
         echo 'user_pref("extensions.htmlaboutaddons.recommendations.enabled", false);' >> "$firefox_config"
     else
-        echo "Could not address Firefox. Configuration file not found."
+        echo "Firefox: Configuration file not found. Not installed or not used."
     fi
 
     thunderbird_config=$(find "/home/${SUDO_USER:-$USER}/.thunderbird/" -name "*.default-esr" -exec echo {}/prefs.js \;)
@@ -178,14 +187,51 @@ if [ $? = 0 ]; then
         echo 'user_pref("mail.shell.checkDefaultClient", false);' >> "$thunderbird_config"
         echo 'user_pref("mailnews.start_page.enabled", false);' >> "$thunderbird_config"
     else
-        echo "Could not address Thunderbird. Configuration file not found."
+        echo "Thunderbird: Configuration file not found. Not installed or not used."
     fi
 
-    # Already false by default, just making sure
+	chromium_config=$(find "/home/${SUDO_USER:-$USER}/.config/chromium/" -name "Default/Preferences")
+	if [ -f "$chromium_config" ]; then
+		sed -i 's/"metrics": {/"metrics": {"enabled": false,/' "$chromium_config"
+		sed -i 's/"reporting": {/"reporting": {"enabled": false,/' "$chromium_config"
+	else
+		echo "Chromium: Configuration file not found. Not installed or not used."
+	fi	
+
+    # False by default, just making sure
     gsettings set org.gnome.desktop.privacy send-software-usage-stats false
     gsettings set org.gnome.desktop.privacy report-technical-problems false
 else
 	echo "[>] Skipped Reporting and Telemetry."
+fi
+
+zenity --question --text "Configure and Enable Firewall?" --no-wrap
+if [ $? = 0 ]; then
+    if ! command -v ufw &> /dev/null; then
+        sudo apt install -y ufw
+    else
+		sudo ufw --force reset
+	fi
+	
+	# Default rules
+    sudo ufw default deny incoming
+    sudo ufw default allow outgoing
+
+	# Allow rules
+    sudo ufw allow 631			# CUPS (Printer)
+	sudo ufw allow 80,443/tcp 	# HTTP, HTTPS
+	sudo ufw allow 80,443/udp	# HTTP, HTTPS
+	sudo ufw allow 143,993/tcp	# IMAP (Mail)
+	sudo ufw allow 465,587/tcp	# SMTP (Mail)
+	sudo ufw allow 943/tcp		# OpenVPN
+	sudo ufw allow 1194/udp		# OpenVPN
+	sudo ufw allow 22			# SSH
+	sudo ufw allow 20,21/tcp 	# FTP
+
+    sudo ufw --force enable
+    echo "[+] Firewall configured and enabled successfully."
+else
+    echo "[>] Skipped Firewall configuration."
 fi
 
 zenity --question --text "Update And Upgrade The System?" --no-wrap
