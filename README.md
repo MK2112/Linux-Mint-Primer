@@ -9,6 +9,7 @@ cd Linux-Mint-Primer
 chmod +x mint-primer.sh
 sudo ./mint-primer.sh
 ```
+This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
 
 ## Features
 
@@ -19,8 +20,6 @@ sudo ./mint-primer.sh
 - **Harden:** Setup and configure UFW firewall, SSH Hardening
 - **Customize:** Install a list of programs
 - **Automate:** Set the value of `auto` in `config.txt` to `true` to skip all user interactions and instead configure based on `config.txt` settings.
-
-This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
 
 ## Requirements
 
