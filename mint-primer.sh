@@ -7,10 +7,47 @@ if [ "$EUID" -ne 0 ]; then
 	exit 1
 fi
 
-zenity --question --text="Create Snapshot?" --no-wrap
-if [ $? = 0 ]; then
+# Read config
+read_config() {
+    grep "^$1=" config.txt | cut -d'=' -f2- | tr -d '\r' 2>/dev/null
+}
+
+auto_mode=$(read_config "auto")
+
+if [ "$auto_mode" = "true" ]; then
+	echo "[+] Running In Auto Mode."
+	echo
+	create_snapshot=$(read_config "options/create_snapshot")
+	debloat=$(read_config "options/debloat")
+	portable_use=$(read_config "options/portable_use")
+	disable_flatpak=$(read_config "options/disable_flatpak")
+	optimize_boot=$(read_config "options/optimize_boot")
+	disable_telemetry=$(read_config "options/disable_telemetry")
+	configure_firewall=$(read_config "options/configure_firewall")
+	harden_ssh=$(read_config "options/harden_ssh")
+	update_system=$(read_config "options/update_system")
+	install_programs=$(read_config "options/install_programs")
+	reboot_system=$(read_config "options/reboot_system")
+else
+	echo "[+] Running In Manual Mode."
+	echo "[~] Change value of 'auto' to 'true' in config.txt to enable auto mode."
+	echo
+fi
+
+
+# Create Snapshot
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Create Snapshot?" --no-wrap
+    if [ $? = 0 ]; then
+        create_snapshot="true"
+    else
+        create_snapshot="false"
+    fi
+fi
+
+if [ "$create_snapshot" = "true" ]; then
 	timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-	timeshift --create --comments "LM Primer - System Snapshot - $timestamp" --tags D
+	timeshift --create --comments "LM Primer ::System Snapshot:: $timestamp" --tags D
 
 	if [ $? -eq 0 ]; then
 	  	echo "Timeshift Snapshot Created Successfully."
@@ -23,8 +60,17 @@ else
 	echo "[>] Skipped Snapshot Creation."
 fi
 
-zenity --question --text="Debloat?" --no-wrap
-if [ $? = 0 ]; then
+# Debloat
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Debloat?" --no-wrap
+    if [ $? = 0 ]; then
+        debloat="true"
+    else
+        debloat="false"
+    fi
+fi
+
+if [ "$debloat" = "true" ]; then
  	# Purging these programs (delete from list if program should stay)
 	programs=(
 	    mintwelcome			# Welcome screen
@@ -61,8 +107,17 @@ else
 	echo "[>] Skipped System Debloat."
 fi
 
-zenity --question --text "Prime For Portable Use?" --no-wrap
-if [ $? = 0 ]; then
+# Portable Optimization
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Prime For Portable Use?" --no-wrap
+    if [ $? = 0 ]; then
+        portable_use="true"
+    else
+        portable_use="false"
+    fi
+fi
+
+if [ "$portable_use" = "true" ]; then
 	# TLP, Powertop, ThermalD - Install
  	sudo apt update && sudo apt upgrade -y
 	sudo apt install -y tlp powertop thermald
@@ -131,8 +186,17 @@ else
 	echo "[>] Skipped Optimization For Portability."
 fi
 
-zenity --question --text "Disable Flatpak?" --no-wrap
-if [ $? = 0 ]; then
+# Disable Flatpak
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Disable Flatpak?" --no-wrap
+    if [ $? = 0 ]; then
+        disable_flatpak="true"
+    else
+        disable_flatpak="false"
+    fi
+fi
+
+if [ "$disable_flatpak" = "true" ]; then
 	sudo apt purge flatpak
 	sudo apt-mark hold flatpak
  	echo "[+] Disabled Flatpak."
@@ -140,8 +204,17 @@ else
 	echo "[>] Skipped Disabling Flatpak."
 fi
 
-zenity --question --text "Optimize Boot Time?" --no-wrap
-if [ $? = 0 ]; then
+# Boot Optimization
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Optimize Boot Time?" --no-wrap
+    if [ $? = 0 ]; then
+        optimize_boot="true"
+    else
+        optimize_boot="false"
+    fi
+fi
+
+if [ "$optimize_boot" = "true" ]; then
 	# Decrease GRUB timeout
 	sudo sed -i 's/GRUB_TIMEOUT=10/GRUB_TIMEOUT=1/' /etc/default/grub
 	# Disable GRUB submenu
@@ -163,8 +236,17 @@ else
 	echo "[>] Skipped Boot Optimization."
 fi
 
-zenity --question --text "Disable Reporting and Telemetry?" --no-wrap
-if [ $? = 0 ]; then
+# Disable Reporting and Telemetry
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Disable Reporting and Telemetry?" --no-wrap
+    if [ $? = 0 ]; then
+        disable_telemetry="true"
+    else
+        disable_telemetry="false"
+    fi
+fi
+
+if [ "$disable_telemetry" = "true" ]; then
 	firefox_config=$(find "/home/${SUDO_USER:-$USER}/.mozilla/firefox/" -name "*.default-release" -exec echo {}/prefs.js \;)
     	if [ -f "$firefox_config" ]; then
         	echo 'user_pref("toolkit.telemetry.enabled", false);' >> "$firefox_config"
@@ -206,8 +288,17 @@ else
 	echo "[>] Skipped Reporting and Telemetry."
 fi
 
-zenity --question --text "Configure and Enable Firewall?" --no-wrap
-if [ $? = 0 ]; then
+# Configure Firewall
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Configure and Enable Firewall?" --no-wrap
+    if [ $? = 0 ]; then
+        configure_firewall="true"
+    else
+        configure_firewall="false"
+    fi
+fi
+
+if [ "$configure_firewall" = "true" ]; then
 	if ! command -v ufw &> /dev/null; then
         sudo apt install -y ufw
     else
@@ -235,8 +326,17 @@ else
     echo "[>] Skipped Firewall configuration."
 fi
 
-zenity --question --text "Harden SSH?" --no-wrap
-if [ $? = 0 ]; then
+# Harden SSH
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Harden SSH?" --no-wrap
+    if [ $? = 0 ]; then
+        harden_ssh="true"
+    else
+        harden_ssh="false"
+    fi
+fi
+
+if [ "$harden_ssh" = "true" ]; then
     # Backup SSH config
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
@@ -276,15 +376,33 @@ else
     echo "[>] Skipped SSH hardening."
 fi
 
-zenity --question --text "Update And Upgrade The System?" --no-wrap
-if [ $? = 0 ]; then
+# Update System
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Update And Upgrade The System?" --no-wrap
+    if [ $? = 0 ]; then
+        update_system="true"
+    else
+        update_system="false"
+    fi
+fi
+
+if [ "$update_system" = "true" ]; then
 	sudo apt update && sudo apt upgrade -y
 else
 	echo "[>] Skipped Update."
 fi
 
-zenity --question --text "Install Programs From List?" --no-wrap
-if [ $? = 0 ]; then
+# Install Programs
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Install Programs From List?" --no-wrap
+    if [ $? = 0 ]; then
+        install_programs="true"
+    else
+        install_programs="false"
+    fi
+fi
+
+if [ "$install_programs" = "true" ]; then
 	declare -A tools
 	# Just some examples, modify to your needs
 	tools["Git"]="apt install -y git"
@@ -315,7 +433,16 @@ else
 	echo "[>] Skipped Program Installations."
 fi
 
-zenity --question --text "Script Finished. Reboot Now?" --no-wrap
-if [ $? = 0 ]; then
+# Reboot System
+if ! [ "$auto_mode" = "true" ]; then
+    zenity --question --text="Script Finished. Reboot Now?" --no-wrap
+    if [ $? = 0 ]; then
+        reboot_system="true"
+    else
+        reboot_system="false"
+    fi
+fi
+
+if [ "$reboot_system" = "true" ]; then
 	reboot
 fi
