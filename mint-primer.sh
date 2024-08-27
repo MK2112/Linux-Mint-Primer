@@ -57,7 +57,7 @@ if [ "$create_snapshot" = "true" ]; then
 		exit 1
 	fi
 else
-	echo "[>] Skipped Snapshot Creation."
+	echo "[~] Skipped Snapshot Creation."
 fi
 
 # Debloat
@@ -90,8 +90,8 @@ if [ "$debloat" = "true" ]; then
 	    xreader				# Document viewer
 	    onboard				# On-screen keyboard
 	    celluloid			# Video player
-	    gnome-calendar		# Calendar application
-     	gnome-contacts		# Contacts manager
+		gnome-calendar		# Calendar application
+		gnome-contacts		# Contacts manager
 	    gnome-logs			# Log viewer for the systemd 
 	    gnome-power-manager	# GNOME desktop Power management tool
 	    warpinator			# Tool for local network file sharing
@@ -104,7 +104,7 @@ if [ "$debloat" = "true" ]; then
 	sudo apt autoremove -y && sudo apt clean
  	echo "[+] System Debloated."
 else
-	echo "[>] Skipped System Debloat."
+	echo "[~] Skipped System Debloat."
 fi
 
 # Portable Optimization
@@ -138,27 +138,27 @@ if [ "$portable_use" = "true" ]; then
 	# TLP - Configuration
 	sudo sed -i \
  	-e 's/#TLP_ENABLE=0/TLP_ENABLE=1/' \
-    	-e 's/#TLP_DEFAULT_MODE=AC/TLP_DEFAULT_MODE=AC/' \
-    	-e 's/#TLP_PERSISTENT_DEFAULT=0/TLP_PERSISTENT_DEFAULT=0/' \
-    	-e 's/#CPU_SCALING_GOVERNOR_ON_AC=performance/CPU_SCALING_GOVERNOR_ON_AC=performance/' \
-    	-e 's/#CPU_SCALING_GOVERNOR_ON_BAT=powersave/CPU_SCALING_GOVERNOR_ON_BAT=powersave/' \
-    	-e 's/#CPU_ENERGY_PERF_POLICY_ON_AC=performance/CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance/' \
-    	-e 's/#CPU_ENERGY_PERF_POLICY_ON_BAT=powersave/CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power/' \
-    	-e 's/#CPU_MIN_PERF_ON_AC=0/CPU_MIN_PERF_ON_AC=0/' \
-    	-e 's/#CPU_MAX_PERF_ON_AC=100/CPU_MAX_PERF_ON_AC=100/' \
-    	-e 's/#CPU_MIN_PERF_ON_BAT=0/CPU_MIN_PERF_ON_BAT=0/' \
-    	-e 's/#CPU_MAX_PERF_ON_BAT=30/CPU_MAX_PERF_ON_BAT=60/' \
-    	-e 's/#DISK_DEVICES="sda sdb"/DISK_DEVICES="sda"/' \
-    	-e 's/#DISK_APM_LEVEL_ON_AC="254 254"/DISK_APM_LEVEL_ON_AC="254 254"/' \
-    	-e 's/#DISK_APM_LEVEL_ON_BAT="128 128"/DISK_APM_LEVEL_ON_BAT="128 128"/' \
-    	-e 's/#WIFI_PWR_ON_AC=off/WIFI_PWR_ON_AC=off/' \
-    	-e 's/#WIFI_PWR_ON_BAT=on/WIFI_PWR_ON_BAT=on/' \
-    	-e 's/#WOL_DISABLE=Y/WOL_DISABLE=Y/' \
-    	-e 's/#SOUND_POWER_SAVE_ON_AC=0/SOUND_POWER_SAVE_ON_AC=0/' \
-    	-e 's/#SOUND_POWER_SAVE_ON_BAT=1/SOUND_POWER_SAVE_ON_BAT=1/' \
-    	-e 's/#RUNTIME_PM_ON_AC=on/RUNTIME_PM_ON_AC=on/' \
-    	-e 's/#RUNTIME_PM_ON_BAT=auto/RUNTIME_PM_ON_BAT=auto/' \
-    	/etc/tlp.conf
+	-e 's/#TLP_DEFAULT_MODE=AC/TLP_DEFAULT_MODE=AC/' \
+	-e 's/#TLP_PERSISTENT_DEFAULT=0/TLP_PERSISTENT_DEFAULT=0/' \
+	-e 's/#CPU_SCALING_GOVERNOR_ON_AC=performance/CPU_SCALING_GOVERNOR_ON_AC=performance/' \
+	-e 's/#CPU_SCALING_GOVERNOR_ON_BAT=powersave/CPU_SCALING_GOVERNOR_ON_BAT=powersave/' \
+	-e 's/#CPU_ENERGY_PERF_POLICY_ON_AC=performance/CPU_ENERGY_PERF_POLICY_ON_AC=balance_performance/' \
+	-e 's/#CPU_ENERGY_PERF_POLICY_ON_BAT=powersave/CPU_ENERGY_PERF_POLICY_ON_BAT=balance_power/' \
+	-e 's/#CPU_MIN_PERF_ON_AC=0/CPU_MIN_PERF_ON_AC=0/' \
+	-e 's/#CPU_MAX_PERF_ON_AC=100/CPU_MAX_PERF_ON_AC=100/' \
+	-e 's/#CPU_MIN_PERF_ON_BAT=0/CPU_MIN_PERF_ON_BAT=0/' \
+	-e 's/#CPU_MAX_PERF_ON_BAT=30/CPU_MAX_PERF_ON_BAT=60/' \
+	-e 's/#DISK_DEVICES="sda"/DISK_DEVICES="sda"/' \
+	-e 's/#DISK_APM_LEVEL_ON_AC="254 254"/DISK_APM_LEVEL_ON_AC="254 254"/' \
+	-e 's/#DISK_APM_LEVEL_ON_BAT="128 128"/DISK_APM_LEVEL_ON_BAT="128 128"/' \
+	-e 's/#WIFI_PWR_ON_AC=off/WIFI_PWR_ON_AC=off/' \
+	-e 's/#WIFI_PWR_ON_BAT=on/WIFI_PWR_ON_BAT=on/' \
+	-e 's/#WOL_DISABLE=Y/WOL_DISABLE=Y/' \
+	-e 's/#SOUND_POWER_SAVE_ON_AC=0/SOUND_POWER_SAVE_ON_AC=0/' \
+	-e 's/#SOUND_POWER_SAVE_ON_BAT=1/SOUND_POWER_SAVE_ON_BAT=1/' \
+	-e 's/#RUNTIME_PM_ON_AC=on/RUNTIME_PM_ON_AC=on/' \
+	-e 's/#RUNTIME_PM_ON_BAT=auto/RUNTIME_PM_ON_BAT=auto/' \
+	/etc/tlp.conf
 
 	# Disable Bluetooth on startup
 	BT_CONF_FILE="/etc/bluetooth/main.conf"
@@ -183,7 +183,7 @@ if [ "$portable_use" = "true" ]; then
  
 	echo "[+] Successfully Optimized For Portability."
 else
-	echo "[>] Skipped Optimization For Portability."
+	echo "[~] Skipped Optimization For Portability."
 fi
 
 # Disable Flatpak
@@ -201,7 +201,7 @@ if [ "$disable_flatpak" = "true" ]; then
 	sudo apt-mark hold flatpak
  	echo "[+] Disabled Flatpak."
 else
-	echo "[>] Skipped Disabling Flatpak."
+	echo "[~] Skipped Disabling Flatpak."
 fi
 
 # Boot Optimization
@@ -233,7 +233,7 @@ if [ "$optimize_boot" = "true" ]; then
 	
  	echo "[+] Boot Optimization Successful."
 else
-	echo "[>] Skipped Boot Optimization."
+	echo "[~] Skipped Boot Optimization."
 fi
 
 # Disable Reporting and Telemetry
@@ -285,7 +285,7 @@ if [ "$disable_telemetry" = "true" ]; then
 	gsettings set org.gnome.desktop.privacy send-software-usage-stats false
 	gsettings set org.gnome.desktop.privacy report-technical-problems false
 else
-	echo "[>] Skipped Reporting and Telemetry."
+	echo "[~] Skipped Reporting and Telemetry."
 fi
 
 # Configure Firewall
@@ -310,20 +310,26 @@ if [ "$configure_firewall" = "true" ]; then
     sudo ufw default allow outgoing
 
 	# Allow rules
-    sudo ufw allow 631			# CUPS (Printer)
-	sudo ufw allow 80,443/tcp 	# HTTP, HTTPS
-	sudo ufw allow 80,443/udp	# HTTP, HTTPS
-	sudo ufw allow 143,993/tcp	# IMAP (Mail)
-	sudo ufw allow 465,587/tcp	# SMTP (Mail)
-	sudo ufw allow 943/tcp		# OpenVPN
-	sudo ufw allow 1194/udp		# OpenVPN
-	sudo ufw allow 22			# SSH
-	sudo ufw allow 20,21/tcp 	# FTP
+	declare -A ufw_rules=(
+		["CUPS (Printer)"]="631"
+		["HTTP, HTTPS (TCP)"]="80,443/tcp"
+		["HTTP, HTTPS (UDP)"]="80,443/udp"
+		["IMAP (Mail)"]="143,993/tcp"
+		["SMTP (Mail)"]="465,587/tcp"
+		["OpenVPN (TCP)"]="943/tcp"
+		["OpenVPN (UDP)"]="1194/udp"
+		["SSH"]="22"
+		["FTP"]="20,21/tcp"
+	)
+
+	for service in "${!ufw_rules[@]}"; do
+		sudo ufw allow ${ufw_rules[$service]} || echo "Failed to allow $service (${ufw_rules[$service]})"
+	done
 
     sudo ufw --force enable
     echo "[+] Firewall configured and enabled successfully."
 else
-    echo "[>] Skipped Firewall configuration."
+    echo "[~] Skipped Firewall configuration."
 fi
 
 # Harden SSH
@@ -339,7 +345,6 @@ fi
 if [ "$harden_ssh" = "true" ]; then
     # Backup SSH config
     sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-
 	# Move SSH to port 2222
     sudo sed -i '/^#Port 22/c\Port 2222' /etc/ssh/sshd_config
 	# Disable login on root level
@@ -373,7 +378,7 @@ if [ "$harden_ssh" = "true" ]; then
 
     echo "[+] SSH configuration hardened. SSH Port Changed To 2222. Requests To Port 22 Will Be Denied."
 else
-    echo "[>] Skipped SSH hardening."
+    echo "[~] Skipped SSH hardening."
 fi
 
 # Update System
@@ -389,7 +394,7 @@ fi
 if [ "$update_system" = "true" ]; then
 	sudo apt update && sudo apt upgrade -y
 else
-	echo "[>] Skipped Update."
+	echo "[~] Skipped Update."
 fi
 
 # Install Programs
@@ -403,21 +408,27 @@ if ! [ "$auto_mode" = "true" ]; then
 fi
 
 if [ "$install_programs" = "true" ]; then
-	declare -A tools
 	# Just some examples, modify to your needs
-	tools["Git"]="apt install -y git"
-	tools["Git-LFS"]="apt install -y git-lfs"
-	tools["VLC"]="apt install -y vlc"
-	tools["Flameshot"]="apt install -y flameshot"
-	tools["PDFArranger"]="apt install -y pdfarranger"
-	tools["OneDrive"]="apt install -y onedrive"
-	tools["OBS"]="apt install -y obs-studio"
-	tools["Audacity"]="apt install -y audacity"
-	tools["Brasero"]="apt install -y brasero"
-	tools["Kid3"]="apt install -y kid3"
-	tools["Pinta"]="apt install -y pinta"
-	tools["Remmina"]="apt install -y remmina"
-	tools["NumLockX"]="apt install -y numlockx"
+	# Using somewhat cumbersome "apt install -y" for each entry to allow for other custom install commands
+	# (user might want to `curl` or `wget` something, or use `snap` or `flatpak` for some programs, this works here)
+	declare -A tools=(
+		["GParted"]="apt install -y gparted"
+		["Htop"]="apt install -y htop"
+		["Neofetch"]="apt install -y neofetch"
+		["Git"]="apt install -y git"
+		["Git-LFS"]="apt install -y git-lfs"
+		["VLC"]="apt install -y vlc"
+		["Flameshot"]="apt install -y flameshot"
+		["PDFArranger"]="apt install -y pdfarranger"
+		["OneDrive"]="apt install -y onedrive"
+		["OBS"]="apt install -y obs-studio"
+		["Audacity"]="apt install -y audacity"
+		["Brasero"]="apt install -y brasero"
+		["Kid3"]="apt install -y kid3"
+		["Pinta"]="apt install -y pinta"
+		["Remmina"]="apt install -y remmina"
+		["NumLockX"]="apt install -y numlockx"
+	)
 
 	for tool in "${!tools[@]}"; do
 		echo "Installing $tool..."
@@ -430,12 +441,12 @@ if [ "$install_programs" = "true" ]; then
 		fi
 	done
 else
-	echo "[>] Skipped Program Installations."
+	echo "[~] Skipped Program Installations."
 fi
 
 # Reboot System
 if ! [ "$auto_mode" = "true" ]; then
-    zenity --question --text="Script Finished. Reboot Now?" --no-wrap
+    zenity --question --text="Reboot Now?" --no-wrap
     if [ $? = 0 ]; then
         reboot_system="true"
     else
