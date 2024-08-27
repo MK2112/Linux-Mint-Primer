@@ -15,8 +15,10 @@ sudo ./mint-primer.sh
 - **Backup:** Create a system snapshot before making changes
 - **Debloat:** Remove pre-installed, unnecessary programs
 - **Optimize:** Enhance system performance, configure specifically for portable use, decrease boot time, turn off Flatpak
-- **Secure:** Install security updates, setup and configure UFW firewall
+- **Secure:** Install security updates, reduce telemetry
+- **Harden:** Setup and configure UFW firewall, SSH Hardening
 - **Customize:** Install a list of programs
+- **Automate:** Set the value of `auto` in `config.txt` to `true` to skip all user interactions and instead configure based on `config.txt` settings.
 
 This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
 
