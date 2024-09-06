@@ -1,6 +1,6 @@
 # Linux Mint Primer
 
-Streamline and optimize your Linux Mint 21.3 or 22.
+Streamline and optimize your Linux Mint 22 or 21.3
 
 ```bash
 sudo apt install -y git
@@ -9,7 +9,7 @@ cd Linux-Mint-Primer
 chmod +x mint-primer.sh
 sudo ./mint-primer.sh
 ```
-This project is an enhanced fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
+This project is a fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
 
 ## Features
 
