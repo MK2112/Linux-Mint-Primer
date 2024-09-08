@@ -19,7 +19,7 @@ This project is a fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.co
 - **Secure:** Install security updates, reduce telemetry
 - **Harden:** Setup and configure UFW firewall, SSH Hardening
 - **Customize:** Install a list of programs
-- **Automate:** Set the value of `auto` in `config.txt` to `true` to skip all user interactions and instead configure based on `config.txt` settings.
+- **Automate:** Set the value of `auto` in `config.txt` to `true` to skip all user interactions and instead execute on `config.txt` settings.
 
 ## Requirements
 
