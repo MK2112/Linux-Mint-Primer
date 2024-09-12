@@ -1,13 +1,13 @@
-# Linux Mint Primer
+# Linux Mint Debloater
 
 Streamline and optimize your Linux Mint 22 or 21.3
 
 ```bash
 sudo apt install -y git
-git clone https://github.com/MK2112/Linux-Mint-Primer
-cd Linux-Mint-Primer
-chmod +x mint-primer.sh
-sudo ./mint-primer.sh
+git clone https://github.com/MK2112/Linux-Mint-Debloater
+cd Linux-Mint-Debloater
+chmod +x debloat-mint.sh
+sudo ./debloat-mint.sh
 ```
 This project is a fork of [aaron-dev-git/Linux-Mint-Debloater](https://github.com/aaron-dev-git/Linux-Mint-Debloater).
 
